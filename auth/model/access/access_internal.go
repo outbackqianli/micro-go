@@ -2,8 +2,9 @@ package access
 
 import (
 	"fmt"
-	"outback/micro-go/basic/config"
 	"time"
+
+	"outback/micro-go/basic/config"
 
 	"github.com/dgrijalva/jwt-go"
 )

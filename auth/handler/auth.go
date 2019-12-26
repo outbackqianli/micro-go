@@ -2,9 +2,10 @@ package handler
 
 import (
 	"context"
-	"outback/micro-go/auth/model"
-	"outback/micro-go/auth/model/access"
 	"strconv"
+
+	"outback/micro-go/auth/model/access"
+	auth "outback/micro-go/auth/proto/auth"
 
 	"github.com/micro/go-micro/util/log"
 )
@@ -23,18 +24,18 @@ func Init() {
 	}
 }
 
-type AuthService struct{}
+type Service struct{}
 
 // MakeAccessToken 生成token
-func (s *AuthService) MakeAccessToken(ctx context.Context, req *model.Request, rsp *model.Response) error {
-	log.Info("[MakeAccessToken] 收到创建token请求")
+func (s *Service) MakeAccessToken(ctx context.Context, req *auth.Request, rsp *auth.Response) error {
+	log.Log("[MakeAccessToken] 收到创建token请求")
 
 	token, err := accessService.MakeAccessToken(&access.Subject{
-		ID:   strconv.FormatUint(uint64(req.UserId), 10),
+		ID:   strconv.FormatUint(req.UserId, 10),
 		Name: req.UserName,
 	})
 	if err != nil {
-		rsp.Error = &model.Error{
+		rsp.Error = &auth.Error{
 			Detail: err.Error(),
 		}
 
@@ -47,11 +48,11 @@ func (s *AuthService) MakeAccessToken(ctx context.Context, req *model.Request, r
 }
 
 // DelUserAccessToken 清除用户token
-func (s *AuthService) DelUserAccessToken(ctx context.Context, req *model.Request, rsp *model.Response) error {
+func (s *Service) DelUserAccessToken(ctx context.Context, req *auth.Request, rsp *auth.Response) error {
 	log.Log("[DelUserAccessToken] 清除用户token")
 	err := accessService.DelUserAccessToken(req.Token)
 	if err != nil {
-		rsp.Error = &model.Error{
+		rsp.Error = &auth.Error{
 			Detail: err.Error(),
 		}
 
