@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"outback/micro-go/auth/model/access"
-	auth "outback/micro-go/auth/proto/auth"
 
 	"github.com/micro/go-micro/util/log"
 )
@@ -46,17 +45,17 @@ func (s *Service) MakeAccessToken(ctx context.Context, req *model.User, rsp *mod
 }
 
 // DelUserAccessToken 清除用户token
-func (s *Service) DelUserAccessToken(ctx context.Context, req *auth.Request, rsp *auth.Response) error {
-	log.Log("[DelUserAccessToken] 清除用户token")
-	err := accessService.DelUserAccessToken(req.Token)
-	if err != nil {
-		rsp.Error = &auth.Error{
-			Detail: err.Error(),
-		}
-
-		log.Logf("[DelUserAccessToken] 清除用户token失败，err：%s", err)
-		return err
-	}
-
-	return nil
-}
+//func (s *Service) DelUserAccessToken(ctx context.Context, req *auth.Request, rsp *auth.Response) error {
+//	log.Log("[DelUserAccessToken] 清除用户token")
+//	err := accessService.DelUserAccessToken(req.Token)
+//	if err != nil {
+//		rsp.Error = &auth.Error{
+//			Detail: err.Error(),
+//		}
+//
+//		log.Logf("[DelUserAccessToken] 清除用户token失败，err：%s", err)
+//		return err
+//	}
+//
+//	return nil
+//}
