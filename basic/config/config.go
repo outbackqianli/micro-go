@@ -72,6 +72,7 @@ func Init() {
 
 		// 加载include的文件
 		if err = config.Load(sources...); err != nil {
+			log.Error("config Init error ", err.Error())
 			panic(err)
 		}
 	}

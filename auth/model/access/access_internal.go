@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/micro/go-micro/util/log"
+
 	"outback/micro-go/basic/config"
 
 	"github.com/dgrijalva/jwt-go"
@@ -27,6 +29,8 @@ func (s *service) createTokenClaims(subject *Subject) (m *jwt.StandardClaims, er
 // saveTokenToCache 保存token到缓存
 func (s *service) saveTokenToCache(subject *Subject, val string) (err error) {
 	//保存
+	log.Error("cacha ", ca)
+
 	if err = ca.Set(tokenIDKeyPrefix+subject.ID, val, tokenExpiredDate).Err(); err != nil {
 		return fmt.Errorf("[saveTokenToCache] 保存token到缓存发生错误，err:" + err.Error())
 	}
