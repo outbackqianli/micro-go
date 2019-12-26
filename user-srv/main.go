@@ -24,7 +24,9 @@ func main() {
 	service.Init(micro.Action(func(c *cli.Context) {
 		db.Init()
 	}))
-	micro.RegisterHandler(service.Server(), new(model.User))
+	if err := micro.RegisterHandler(service.Server(), new(model.User)); err != nil {
+		logrus.Fatal(err)
+	}
 
 	// 启动服务
 	if err := service.Run(); err != nil {

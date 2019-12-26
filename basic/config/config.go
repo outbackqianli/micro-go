@@ -42,7 +42,7 @@ func Init() {
 	// 先加载基础配置
 	appPath, _ := filepath.Abs(filepath.Dir(filepath.Join("./", string(filepath.Separator))))
 
-	pt := filepath.Join(appPath, "conf")
+	pt := filepath.Join(appPath, "basic/config/conf")
 	os.Chdir(appPath)
 
 	// 找到application.yml文件
@@ -92,7 +92,7 @@ func GetMysqlConfig() (ret MysqlConfig) {
 }
 
 // GetEtcdConfig 获取etcd配置
-func GetEtcdConfig() (ret EtcdConfig){
+func GetEtcdConfig() (ret EtcdConfig) {
 	return etcdConfig
 }
 
