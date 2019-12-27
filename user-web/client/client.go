@@ -14,7 +14,11 @@ func QueryUserByName(name string) (*model.User, error) {
 	service.Init()
 	c := service.Client()
 	// 请求参数
-	request := c.NewRequest("mu.micro.book.srv.user", "User.QueryUserByName", name, client.WithContentType("application/json"))
+	req := model.User{
+		Name: name,
+	}
+
+	request := c.NewRequest("mu.micro.book.srv.user", "User.QueryUserByName", req, client.WithContentType("application/json"))
 	response := new(model.User)
 	if err := c.Call(context.TODO(), request, response); err != nil {
 		fmt.Println(err)

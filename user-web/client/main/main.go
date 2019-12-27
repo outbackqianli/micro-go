@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/micro/go-micro/registry"
-
 	"github.com/micro/go-micro/util/log"
 )
 
@@ -28,3 +27,17 @@ func main() {
 		fmt.Printf("s is %+v \n", s.Nodes[0].Metadata)
 	}
 }
+
+//import (
+//	"fmt"
+//	client2 "outback/micro-go/user-web/client"
+//)
+//
+//func main() {
+//	user, err := client2.QueryUserByName("micro")
+//	if err != nil {
+//		fmt.Printf("client2.QueryUserByName error is %s \n", err.Error())
+//		return
+//	}
+//	fmt.Printf("client2.QueryUserByName user is %+v \n", user)
+//}
