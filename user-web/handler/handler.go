@@ -35,7 +35,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			log.Errorf("client2.GetToken error ", err.Error())
 			return
 		}
-		fmt.Printf("token is %s ", token)
+		fmt.Printf("token is %s \n", token)
 	}
 
 	fmt.Printf("服务运行成功 user is %+v", user)
