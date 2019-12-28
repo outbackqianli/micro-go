@@ -10,6 +10,7 @@ import (
 func main() {
 	//var h http.Handler
 	r := mux.NewRouter()
+	r.NewRoute()
 	api := httpapi.NewServer(":8089")
 	//h = r
 	api.Handle("/", r)

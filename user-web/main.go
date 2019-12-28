@@ -49,7 +49,9 @@ func main() {
 	//micro.RegisterHandler()
 
 	r := mux.NewRouter()
-	r.Path("/user/login").Methods("GET").HandlerFunc(handler.Login)
+	// queries 表示必传参数，且只能成对出现
+	r.Path("/user/login").Methods("GET").HandlerFunc(handler.Login).Queries("userName", "").Queries("pwd", "")
+	r.Path("/user/login2").Methods("get").HandlerFunc(handler.Login)
 
 	service.Handle("/", r)
 
