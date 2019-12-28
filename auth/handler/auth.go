@@ -2,7 +2,7 @@ package handler
 
 import (
 	"context"
-	"outback/micro-go/user-srv/model"
+	"outback/micro-go/api/entity"
 	"strconv"
 
 	"outback/micro-go/auth/model/access"
@@ -27,7 +27,7 @@ func Init() {
 type Service struct{}
 
 // MakeAccessToken 生成token
-func (s *Service) MakeAccessToken(ctx context.Context, req *model.User, rsp *model.User) error {
+func (s *Service) MakeAccessToken(ctx context.Context, req *entity.User, rsp *entity.User) error {
 	log.Log("[MakeAccessToken] 收到创建token请求,accessService", accessService)
 
 	token, err := accessService.MakeAccessToken(&access.Subject{

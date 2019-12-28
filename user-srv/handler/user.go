@@ -2,22 +2,24 @@ package handler
 
 import (
 	"context"
+	"fmt"
+	"outback/micro-go/api/entity"
 	"outback/micro-go/basic/db"
-	"outback/micro-go/user-srv/model"
-
-	"golang.org/x/tools/go/ssa/interp/testdata/src/fmt"
 
 	"github.com/go-log/log"
 )
 
-func (this *model.User) QueryUserByName(ctx context.Context, req *model.User, response *model.User) error {
+type UserHandler struct {
+}
+
+func (u *UserHandler) QueryUserByName(ctx context.Context, request string, response *entity.User) error {
 	fmt.Println("is there QueryUserByName ")
 
 	queryString := `SELECT user_id, user_name, pwd FROM user WHERE user_name = ?`
 	//获取数据库
 	o := db.GetDB()
 	// 查询
-	err := o.QueryRow(queryString, req.Name).Scan(&response.Id, &response.Name, &response.Pwd)
+	err := o.QueryRow(queryString, request).Scan(&response.Id, &response.Name, &response.Pwd)
 	if err != nil {
 		log.Logf("[QueryUserByName] 查询数据失败，err：%s", err)
 		return err

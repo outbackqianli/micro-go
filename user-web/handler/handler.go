@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	client2 "outback/micro-go/user-web/client"
@@ -33,11 +34,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		token, err := client2.GetToken(user)
 		if err != nil {
 			log.Errorf("client2.GetToken error ", err.Error())
-			return
 		}
 		fmt.Printf("token is %s \n", token)
 	}
-
 	fmt.Printf("服务运行成功 user is %+v", user)
-
+	u, _ := json.Marshal(user)
+	w.Write(u)
 }

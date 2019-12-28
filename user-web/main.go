@@ -3,13 +3,12 @@ package main
 import (
 	"log"
 	"outback/micro-go/basic"
+	"outback/micro-go/user-web/client"
 	"outback/micro-go/user-web/handler"
 
 	"github.com/gorilla/mux"
-
-	"github.com/micro/go-micro/registry"
-
 	"github.com/micro/cli"
+	"github.com/micro/go-micro/registry"
 	"github.com/micro/go-micro/web"
 )
 
@@ -35,31 +34,16 @@ func main() {
 		web.Action(
 			func(c *cli.Context) {
 				// 初始化handler
-				//handler.Init()
+				client.Init()
 			}),
 	); err != nil {
 		log.Fatal(err)
 	}
 
-	// 注册登录接口
-
-	//r := mux.NewRouter().Path("/user/login").Methods("GET").HandlerFunc(handler.Login)
-	//r := mux.NewRouter()
-	//http.Handle("/", r)
-	//micro.RegisterHandler()
-
 	r := mux.NewRouter()
 	// queries 表示必传参数，且只能成对出现
 	r.Path("/user/login").Methods("GET").HandlerFunc(handler.Login).Queries("userName", "").Queries("pwd", "")
-	r.Path("/user/login2").Methods("get").HandlerFunc(handler.Login)
-
 	service.Handle("/", r)
-
-	//service.HandleFunc("/user/login", handler.Login)
-	//service.HandleFunc("/user/login2", handler.Login)
-	//service.HandleFunc("/user/login3", handler.Login)
-	//service.HandleFunc("/user/login4", handler.Login)
-
 	// 运行服务
 	if err := service.Run(); err != nil {
 		log.Fatal(err)

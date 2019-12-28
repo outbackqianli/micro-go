@@ -1,13 +1,15 @@
 package main
 
 import (
+	"outback/micro-go/api/constent"
 	"outback/micro-go/basic"
 	"outback/micro-go/basic/db"
-	"outback/micro-go/user-srv/model"
+	"outback/micro-go/user-srv/handler"
+
+	"github.com/micro/go-micro/util/log"
 
 	"github.com/micro/cli"
 	"github.com/micro/go-micro"
-	"github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -16,7 +18,7 @@ func main() {
 
 	// 新建服务
 	service := micro.NewService(
-		micro.Name("mu.micro.book.srv.user"),
+		micro.Name(constent.ServiceName),
 		micro.Version("latest"),
 	)
 
@@ -24,12 +26,12 @@ func main() {
 	service.Init(micro.Action(func(c *cli.Context) {
 		db.Init()
 	}))
-	if err := micro.RegisterHandler(service.Server(), new(model.User)); err != nil {
-		logrus.Fatal(err)
+	if err := micro.RegisterHandler(service.Server(), new(handler.UserHandler)); err != nil {
+		log.Fatal(err)
 	}
 
 	// 启动服务
 	if err := service.Run(); err != nil {
-		logrus.Fatal(err)
+		log.Fatal(err)
 	}
 }
