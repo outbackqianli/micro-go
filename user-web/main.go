@@ -3,7 +3,8 @@ package main
 import (
 	"log"
 	"outback/micro-go/basic"
-	"outback/micro-go/user-web/client"
+	"outback/micro-go/plugin/breaker"
+	userClient "outback/micro-go/user-web/client"
 	"outback/micro-go/user-web/handler"
 
 	"github.com/gorilla/mux"
@@ -34,7 +35,7 @@ func main() {
 		web.Action(
 			func(c *cli.Context) {
 				// 初始化handler
-				client.Init()
+				userClient.Init()
 			}),
 	); err != nil {
 		log.Fatal(err)
@@ -43,7 +44,7 @@ func main() {
 	r := mux.NewRouter()
 	// queries 表示必传参数，且只能成对出现
 	r.Path("/user/login").Methods("GET").HandlerFunc(handler.Login).Queries("userName", "").Queries("pwd", "")
-	service.Handle("/", r)
+	service.Handle("/", breaker.BreakerWrapper(r))
 	// 运行服务
 	if err := service.Run(); err != nil {
 		log.Fatal(err)
