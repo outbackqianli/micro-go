@@ -24,7 +24,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	//prePwd := r.Form.Get("pwd")
 	user, err := client2.QueryUserByName(name)
 	if err != nil {
-		log.Errorf("client2.QueryUserByName error ", err.Error())
+		fmt.Printf("login 查询QueryUserByName 出错了，error is %s，进行返回\n", err.Error())
+		//return
 	}
 
 	//if user.Pwd == prePwd {
@@ -37,7 +38,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	//}
 	fmt.Printf("登录成功 user is %+v \n", user)
 	u, _ := json.Marshal(user)
+	//w.WriteHeader(http.StatusOK)
 	w.Write(u)
-	log.Info("Login 执行完成")
-
+	fmt.Println("Login 执行完成")
 }

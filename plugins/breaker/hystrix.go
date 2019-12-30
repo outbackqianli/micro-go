@@ -1,46 +1,51 @@
+/*
+这个包可以进行服务的熔断
+*/
+
 package breaker
 
 import (
 	"context"
-	"errors"
 	"fmt"
-
-	"github.com/micro/go-micro/util/log"
+	"outback/micro-go/api/entity"
 
 	"github.com/afex/hystrix-go/hystrix"
 	"github.com/micro/go-micro/client"
 )
 
-type clientWrapper struct {
+type userClientWrapper struct {
 	client.Client
 }
 
-func (c *clientWrapper) Call(ctx context.Context, req client.Request, rsp interface{}, opts ...client.CallOption) error {
-	fmt.Println("befor res", rsp, "\n")
+func (c *userClientWrapper) Call(ctx context.Context, req client.Request, rsp interface{}, opts ...client.CallOption) error {
 	runFunc := func() error {
-		log.Info("服务熔断开始时 run Func")
+		fmt.Println("熔断执行开始runFunc")
 		err := c.Client.Call(ctx, req, rsp, opts...)
-		log.Info("服务熔断开始时 run Func error is ", err)
+		fmt.Printf("熔断执行完Call 方法 error is %s \n", err)
 		return err
 	}
 	fallbackFunc := func(err error) error {
 		if err != nil {
-			log.Info("服务熔断开始了,执行fallbackFunc")
+			fmt.Println("熔断执行fallbackFunc")
+			rspUser, _ := rsp.(*entity.User)
+			rspUser.Id = 12
+			rspUser.Name = "熔断之后的返回"
+			rspUser.Pwd = "熔断之后的返回"
+
 		}
-		return errors.New("fuck")
+		return err
 	}
 
 	commandName := req.Service() + "." + req.Endpoint()
 	err := hystrix.Do(commandName, runFunc, fallbackFunc)
-	fmt.Printf("after res is  %+v,the error is %s \n", rsp, err)
 
 	return err
 }
 
-// NewClientWrapper returns a hystrix client Wrapper.
-func NewClientWrapper() client.Wrapper {
+// NewUserClientWrapper returns a hystrix client Wrapper.
+func NewUserClientWrapper() client.Wrapper {
 	fn := func(c client.Client) client.Client {
-		return &clientWrapper{c}
+		return &userClientWrapper{c}
 	}
 	return fn
 }

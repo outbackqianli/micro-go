@@ -24,5 +24,6 @@ func (u *UserHandler) QueryUserByName(ctx context.Context, request string, respo
 		return err
 	}
 	time.Sleep(time.Second * 2)
+	//return errors.New("执行出错")
 	return nil
 }

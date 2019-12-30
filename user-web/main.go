@@ -8,6 +8,7 @@ import (
 	"outback/micro-go/user-web/handler"
 
 	"github.com/gorilla/mux"
+
 	"github.com/micro/cli"
 	"github.com/micro/go-micro/registry"
 	"github.com/micro/go-micro/web"
@@ -44,6 +45,10 @@ func main() {
 	r := mux.NewRouter()
 	// queries 表示必传参数，且只能成对出现
 	r.Path("/user/login").Methods("GET").HandlerFunc(handler.Login)
+	//hand := breaker.BreakerWrapper(handler.Login)
+
+	//service.HandleFunc("/user/login", handler.Login)
+
 	service.Handle("/", breaker.BreakerWrapper(r))
 	//service.Handle("/", r)
 	// 运行服务

@@ -3,38 +3,49 @@ package breaker
 import (
 	"errors"
 	"fmt"
-	"net/http"
-	statusCode "outback/micro-go/plugins/http"
+	nethttp "net/http"
+	"outback/micro-go/plugins/http"
 
 	"github.com/afex/hystrix-go/hystrix"
 )
 
 //BreakerWrapper hystrix breaker
-func BreakerWrapper(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func BreakerWrapper(h nethttp.Handler) nethttp.Handler {
+	return nethttp.HandlerFunc(func(w nethttp.ResponseWriter, r *nethttp.Request) {
 
 		name := r.Method + "-" + r.RequestURI
 
+		//runFunc := func() error {
+		//	fmt.Println("开始降级 runFunc")
+		//	//w.WriteHeader(nethttp.StatusOK)
+		//	//w.Write([]byte("Ok"))
+		//	h.ServeHTTP(w, r)
+		//	return nil
+		//}
 		runFunc := func() error {
-			sct := &statusCode.StatusCodeTracker{ResponseWriter: w, Status: http.StatusOK}
+			sct := &http.StatusCodeTracker{ResponseWriter: w, Status: nethttp.StatusOK}
 			h.ServeHTTP(sct.WrappedResponseWriter(), r)
-			fmt.Printf("降级时 status is %d", sct.Status)
-			if sct.Status >= http.StatusInternalServerError {
+
+			if sct.Status >= nethttp.StatusInternalServerError {
 				str := fmt.Sprintf("status code %d", sct.Status)
 				return errors.New(str)
 			}
 			return nil
 		}
+
 		fallbackFunc := func(e error) error {
-			//if e == hystrix.ErrCircuitOpen {
-			if e != nil {
-				fmt.Printf("触发了降级：errr is %s", e.Error())
-				w.WriteHeader(http.StatusAccepted)
+			fmt.Println("开始降级 fallbackFunc")
+			if e == hystrix.ErrCircuitOpen {
+				//if e != nil {
+				fmt.Printf("触发了降级：errr is %s\n", e.Error())
+				w.WriteHeader(nethttp.StatusAccepted)
 				w.Write([]byte("请稍后重试"))
 			}
+			fmt.Println("触发了降级，但不是ErrCircuitOpen，error is ", e)
 			return e
 		}
 
 		hystrix.Do(name, runFunc, fallbackFunc)
+
 	})
 }
