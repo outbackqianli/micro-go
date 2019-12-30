@@ -2,9 +2,9 @@ package handler
 
 import (
 	"context"
-	"fmt"
 	"outback/micro-go/api/entity"
 	"outback/micro-go/basic/db"
+	"time"
 
 	"github.com/go-log/log"
 )
@@ -13,7 +13,6 @@ type UserHandler struct {
 }
 
 func (u *UserHandler) QueryUserByName(ctx context.Context, request string, response *entity.User) error {
-	fmt.Println("is there QueryUserByName ")
 
 	queryString := `SELECT user_id, user_name, pwd FROM user WHERE user_name = ?`
 	//获取数据库
@@ -24,5 +23,6 @@ func (u *UserHandler) QueryUserByName(ctx context.Context, request string, respo
 		log.Logf("[QueryUserByName] 查询数据失败，err：%s", err)
 		return err
 	}
+	time.Sleep(time.Second * 2)
 	return nil
 }

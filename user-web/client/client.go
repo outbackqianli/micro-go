@@ -5,14 +5,13 @@ import (
 	"fmt"
 	"outback/micro-go/api/entity"
 	"outback/micro-go/api/service"
+	"outback/micro-go/plugins/breaker"
 
 	"github.com/micro/go-micro/util/log"
 
 	hystrix_go "github.com/afex/hystrix-go/hystrix"
-	"github.com/micro/go-micro/client"
-	"github.com/micro/go-plugins/wrapper/breaker/hystrix"
-
 	"github.com/micro/go-micro"
+	"github.com/micro/go-micro/client"
 )
 
 var (
@@ -22,25 +21,28 @@ var (
 func Init() {
 	hystrix_go.DefaultVolumeThreshold = 1
 	hystrix_go.DefaultErrorPercentThreshold = 1
-	userClient = hystrix.NewClientWrapper()(client.DefaultClient)
-	userClient.Init(
-		client.Retries(3),
-		//为了调试看log方便，始终返回true, nil，即会一直重试直至重试次数用尽
-		client.Retry(func(ctx context.Context, req client.Request, retryCount int, err error) (bool, error) {
-			log.Log(req.Method(), retryCount, " client retry")
-			return true, nil
-		}),
-	)
+	hystrix_go.DefaultTimeout = 1000 * 1
+	userClient = breaker.NewClientWrapper()(client.DefaultClient)
+	//userClient.Init(
+	//	client.Retries(3),
+	//	为了调试看log方便，始终返回true, nil，即会一直重试直至重试次数用尽
+	//client.Retry(func(ctx context.Context, req client.Request, retryCount int, err error) (bool, error) {
+	//	log.Log(req.Method(), retryCount, " client retry")
+	//	return true, nil
+	//}),
+	//)
 }
 
 func QueryUserByName(name string) (*entity.User, error) {
-	fmt.Println("web is there QueryUserByName")
 	userService := service.NewUserService(userClient)
 	request := userService.Clint.NewRequest(userService.Name, "UserHandler.QueryUserByName", name, client.WithContentType("application/json"))
 	response := new(entity.User)
-	if err := userService.Clint.Call(context.TODO(), request, response); err != nil {
-		fmt.Println(err)
-		return nil, err
+	log.Info("开始调用服务\n")
+	err := userService.Clint.Call(context.TODO(), request, response)
+	if err != nil {
+		fmt.Printf("userService.Clint.Call UserHandler.QueryUserByName 调用出错了 error is %s\n", err.Error())
+		fmt.Printf("此时response is %+v \n", response)
+		return response, err
 	}
 	return response, nil
 }

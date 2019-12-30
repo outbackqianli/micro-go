@@ -29,7 +29,6 @@ func main() {
 	if err := micro.RegisterHandler(service.Server(), new(handler.UserHandler)); err != nil {
 		log.Fatal(err)
 	}
-
 	// 启动服务
 	if err := service.Run(); err != nil {
 		log.Fatal(err)

@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 	"outback/micro-go/basic"
-	"outback/micro-go/plugin/breaker"
+	"outback/micro-go/plugins/breaker"
 	userClient "outback/micro-go/user-web/client"
 	"outback/micro-go/user-web/handler"
 
@@ -43,8 +43,9 @@ func main() {
 
 	r := mux.NewRouter()
 	// queries 表示必传参数，且只能成对出现
-	r.Path("/user/login").Methods("GET").HandlerFunc(handler.Login).Queries("userName", "").Queries("pwd", "")
+	r.Path("/user/login").Methods("GET").HandlerFunc(handler.Login)
 	service.Handle("/", breaker.BreakerWrapper(r))
+	//service.Handle("/", r)
 	// 运行服务
 	if err := service.Run(); err != nil {
 		log.Fatal(err)

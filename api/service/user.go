@@ -14,9 +14,8 @@ type UserService interface {
 }
 
 type userService struct {
-	Clint  client.Client
-	Name   string
-	Method UserService
+	Clint client.Client
+	Name  string
 }
 
 var (
