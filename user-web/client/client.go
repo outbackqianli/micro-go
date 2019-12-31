@@ -2,10 +2,11 @@ package client
 
 import (
 	"context"
-	"fmt"
 	"outback/micro-go/api/entity"
 	"outback/micro-go/api/service"
 	"outback/micro-go/plugins/breaker"
+
+	"github.com/micro/go-micro/util/log"
 
 	hystrix_go "github.com/afex/hystrix-go/hystrix"
 	"github.com/micro/go-micro"
@@ -19,8 +20,8 @@ var (
 func Init() {
 	hystrix_go.DefaultVolumeThreshold = 2
 	hystrix_go.DefaultErrorPercentThreshold = 50
-	hystrix_go.DefaultTimeout = 1000 * 1
-	userconfig := hystrix_go.CommandConfig{Timeout: hystrix_go.DefaultTimeout * 2}
+	hystrix_go.DefaultTimeout = 1000 * 2
+	userconfig := hystrix_go.CommandConfig{Timeout: hystrix_go.DefaultTimeout / 2}
 	hystrix_go.ConfigureCommand("GET-/user/login", userconfig)
 	userClient = breaker.NewUserClientWrapper()(client.DefaultClient)
 	//userClient.Init(
@@ -37,11 +38,10 @@ func QueryUserByName(name string) (*entity.User, error) {
 	userService := service.NewUserService(userClient)
 	request := userService.Clint.NewRequest(userService.Name, "UserHandler.QueryUserByName", name, client.WithContentType("application/json"))
 	response := new(entity.User)
-	fmt.Println("client 开始调用服务")
+	log.Info("client 开始调用服务")
 	err := userService.Clint.Call(context.TODO(), request, response)
 	if err != nil {
-		fmt.Printf("服务调用出错了 error is %s\n", err.Error())
-		//fmt.Printf("此时response is %+v \n", response)
+		log.Infof("服务调用出错了 error is %s\n", err.Error())
 		return response, err
 	}
 	return response, nil
@@ -56,7 +56,7 @@ func GetToken(user *entity.User) (string, error) {
 	request := c.NewRequest("mu.micro.book.srv.auth", "Service.MakeAccessToken", user, client.WithContentType("application/json"))
 	response := new(entity.User)
 	if err := c.Call(context.TODO(), request, response); err != nil {
-		fmt.Println(err)
+		log.Info("get token err", err)
 		return "", err
 	}
 	return response.Token, nil

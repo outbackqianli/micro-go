@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	client2 "outback/micro-go/user-web/client"
 
@@ -24,7 +23,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	//prePwd := r.Form.Get("pwd")
 	user, err := client2.QueryUserByName(name)
 	if err != nil {
-		fmt.Printf("login 查询QueryUserByName 出错了，error is %s，进行返回\n", err.Error())
+		log.Infof("login 查询QueryUserByName 出错了，error is %s，进行返回\n", err.Error())
 		//return
 	}
 
@@ -36,9 +35,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	//	}
 	//	fmt.Printf("token is %s \n", token)
 	//}
-	fmt.Printf("登录成功 user is %+v \n", user)
+	log.Infof("登录成功 user is %+v \n", user)
 	u, _ := json.Marshal(user)
 	//w.WriteHeader(http.StatusOK)
 	w.Write(u)
-	fmt.Println("Login 执行完成")
+	log.Infof("Login 执行完成")
 }
