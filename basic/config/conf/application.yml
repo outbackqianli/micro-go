@@ -1,5 +1,6 @@
 app:
     profiles:
-        include: etcd, db,redis
+        #        include: etcd, db,redis
+        include:
     jwt:
         secretKey: W6VjDud2W1kMG3BicbMNlGgI4ZfcoHtMGLWr

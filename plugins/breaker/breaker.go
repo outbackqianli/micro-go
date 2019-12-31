@@ -14,7 +14,7 @@ func BreakerWrapper(h nethttp.Handler) nethttp.Handler {
 
 		name := r.Method + "-" + r.RequestURI
 		log.Info("降级name ", name)
-
+		log.Debug("name")
 		runFunc := func() error {
 			log.Info("开始降级 runFunc")
 			//w.WriteHeader(nethttp.StatusOK)

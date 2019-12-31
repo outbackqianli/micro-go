@@ -1,11 +1,12 @@
 package main
 
 import (
-	"log"
 	"outback/micro-go/basic"
 	"outback/micro-go/plugins/breaker"
 	userClient "outback/micro-go/user-web/client"
 	"outback/micro-go/user-web/handler"
+
+	"github.com/micro/go-micro/util/log"
 
 	"github.com/gorilla/mux"
 
@@ -41,7 +42,8 @@ func main() {
 	); err != nil {
 		log.Fatal(err)
 	}
-
+	log.Debug("debug  ")
+	log.Info("INfo")
 	r := mux.NewRouter()
 	// queries 表示必传参数，且只能成对出现
 	r.Path("/user/login").Methods("GET").HandlerFunc(handler.Login)
