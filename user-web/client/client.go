@@ -17,9 +17,11 @@ var (
 )
 
 func Init() {
-	hystrix_go.DefaultVolumeThreshold = 1
-	hystrix_go.DefaultErrorPercentThreshold = 1
+	hystrix_go.DefaultVolumeThreshold = 2
+	hystrix_go.DefaultErrorPercentThreshold = 50
 	hystrix_go.DefaultTimeout = 1000 * 1
+	userconfig := hystrix_go.CommandConfig{Timeout: hystrix_go.DefaultTimeout * 2}
+	hystrix_go.ConfigureCommand("GET-/user/login", userconfig)
 	userClient = breaker.NewUserClientWrapper()(client.DefaultClient)
 	//userClient.Init(
 	//	client.Retries(3),
