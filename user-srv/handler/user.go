@@ -4,7 +4,6 @@ import (
 	"context"
 	"outback/micro-go/api/entity"
 	"outback/micro-go/basic/db"
-	"time"
 
 	"github.com/go-log/log"
 )
@@ -23,7 +22,7 @@ func (u *UserHandler) QueryUserByName(ctx context.Context, request string, respo
 		log.Logf("[QueryUserByName] 查询数据失败，err：%s", err)
 		return err
 	}
-	time.Sleep(time.Second * 2)
+	//time.Sleep(time.Second * 2)
 	//return errors.New("执行出错")
 	return nil
 }

@@ -4,7 +4,6 @@ import (
 	"context"
 	"outback/micro-go/api/entity"
 	"outback/micro-go/api/service"
-	"outback/micro-go/plugins/breaker"
 
 	"github.com/micro/go-micro/util/log"
 
@@ -20,10 +19,12 @@ var (
 func Init() {
 	hystrix_go.DefaultVolumeThreshold = 2
 	hystrix_go.DefaultErrorPercentThreshold = 50
-	hystrix_go.DefaultTimeout = 1000 * 2
-	userconfig := hystrix_go.CommandConfig{Timeout: hystrix_go.DefaultTimeout / 2}
-	hystrix_go.ConfigureCommand("GET-/user/login", userconfig)
-	userClient = breaker.NewUserClientWrapper()(client.DefaultClient)
+	hystrix_go.DefaultTimeout = 1000 * 4
+	//userconfig := hystrix_go.CommandConfig{Timeout: hystrix_go.DefaultTimeout / 2}
+	//hystrix_go.ConfigureCommand("GET-/user/login", userconfig)
+	//userClient = breaker.NewUserClientWrapper()(client.DefaultClient)
+	userClient = client.DefaultClient
+
 	//userClient.Init(
 	//	client.Retries(3),
 	//	为了调试看log方便，始终返回true, nil，即会一直重试直至重试次数用尽
@@ -34,12 +35,12 @@ func Init() {
 	//)
 }
 
-func QueryUserByName(name string) (*entity.User, error) {
+func QueryUserByName(ctx context.Context, name string) (*entity.User, error) {
 	userService := service.NewUserService(userClient)
 	request := userService.Clint.NewRequest(userService.Name, "UserHandler.QueryUserByName", name, client.WithContentType("application/json"))
 	response := new(entity.User)
 	log.Info("client 开始调用服务")
-	err := userService.Clint.Call(context.TODO(), request, response)
+	err := userService.Clint.Call(ctx, request, response)
 	if err != nil {
 		log.Infof("服务调用出错了 error is %s\n", err.Error())
 		return response, err
@@ -47,7 +48,7 @@ func QueryUserByName(name string) (*entity.User, error) {
 	return response, nil
 }
 
-func GetToken(user *entity.User) (string, error) {
+func GetToken(ctx context.Context, user *entity.User) (string, error) {
 	service := micro.NewService()
 	service.Init()
 	c := service.Client()
@@ -55,7 +56,7 @@ func GetToken(user *entity.User) (string, error) {
 
 	request := c.NewRequest("mu.micro.book.srv.auth", "Service.MakeAccessToken", user, client.WithContentType("application/json"))
 	response := new(entity.User)
-	if err := c.Call(context.TODO(), request, response); err != nil {
+	if err := c.Call(ctx, request, response); err != nil {
 		log.Info("get token err", err)
 		return "", err
 	}

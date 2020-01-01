@@ -2,9 +2,12 @@ package main
 
 import (
 	"outback/micro-go/basic"
-	"outback/micro-go/plugins/breaker"
+	tracer "outback/micro-go/plugins/tracer/jaeger"
+	"outback/micro-go/plugins/tracer/opentracing/std2micro"
 	userClient "outback/micro-go/user-web/client"
 	"outback/micro-go/user-web/handler"
+
+	"github.com/opentracing/opentracing-go"
 
 	"github.com/micro/go-micro/util/log"
 
@@ -22,6 +25,14 @@ func main() {
 	// 使用etcd注册
 	//micReg := etcd.NewRegistry(registryOptions)
 	//reg := memory.NewRegistry()
+
+	t, io, err := tracer.NewTracer("my-new-trace", "")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer io.Close()
+	opentracing.SetGlobalTracer(t)
+
 	reg := registry.DefaultRegistry
 	// 创建新服务
 	service := web.NewService(
@@ -42,6 +53,9 @@ func main() {
 	); err != nil {
 		log.Fatal(err)
 	}
+	//设置采样率
+	std2micro.SetSamplingFrequency(100)
+
 	log.Debug("debug  ")
 	log.Info("INfo")
 	r := mux.NewRouter()
@@ -51,8 +65,8 @@ func main() {
 
 	//service.HandleFunc("/user/login", handler.Login)
 
-	service.Handle("/", breaker.BreakerWrapper(r))
-	//service.Handle("/", r)
+	//service.Handle("/", breaker.BreakerWrapper(r))
+	service.Handle("/", std2micro.TracerWrapper(r))
 	// 运行服务
 	if err := service.Run(); err != nil {
 		log.Fatal(err)

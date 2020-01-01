@@ -20,6 +20,7 @@ func main() {
 	service := micro.NewService(
 		micro.Name(constent.ServiceName),
 		micro.Version("latest"),
+		//micro.WrapHandler(openTrace.NewHandlerWrapper(opentracing.GlobalTracer())),
 	)
 
 	// 服务初始化
