@@ -26,7 +26,15 @@ func (c *userClientWrapper) Call(ctx context.Context, req client.Request, rsp in
 		return err
 	}
 	fallbackFunc := func(err error) error {
-		if err != nil {
+		if err == hystrix.ErrCircuitOpen {
+			log.Infof("降级fallbackFunc error is ", err.Error())
+			rspUser, _ := rsp.(*entity.User)
+			rspUser.Id = 13
+			rspUser.Name = "降级之后的返回"
+			rspUser.Pwd = "降级之后的返回"
+			return nil
+		}
+		if err != hystrix.ErrCircuitOpen && err != nil {
 			log.Infof("熔断执行fallbackFunc error is ", err.Error())
 			rspUser, _ := rsp.(*entity.User)
 			rspUser.Id = 12
@@ -38,15 +46,8 @@ func (c *userClientWrapper) Call(ctx context.Context, req client.Request, rsp in
 	}
 	commandName := req.Service() + "." + req.Endpoint()
 	log.Info("熔断name is ", commandName)
-	//output := make(chan bool, 1)
 
-	errs := hystrix.Do("GET-/user/login", runFunc, fallbackFunc)
-	//select {
-	//case _ = <-output:
-	//	return nil
-	//case err := <-errs:
-	//	return err
-	//}
+	errs := hystrix.Do(commandName, runFunc, fallbackFunc)
 	return errs
 }
 

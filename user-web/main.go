@@ -62,7 +62,7 @@ func main() {
 	// queries 表示必传参数，且只能成对出现
 	r.Path("/user/login").Methods("GET").HandlerFunc(handler.Login)
 	//service.Handle("/", breaker.BreakerWrapper(r))
-	// 增加链路追踪
+	//增加链路追踪
 	service.Handle("/", std2micro.TracerWrapper(r))
 	// 运行服务
 	if err := service.Run(); err != nil {
