@@ -41,6 +41,19 @@ func QueryUserByName(ctx context.Context, name string) (*entity.User, error) {
 	return response, nil
 }
 
+func QueryUserByName2(ctx context.Context, name string) (*entity.User, error) {
+	userService := service.NewUserService(userClient)
+	request := userService.Clint.NewRequest(userService.Name, "UserHandler.QueryUserByName2", name, client.WithContentType("application/json"))
+	response := new(entity.User)
+	log.Info("client 开始调用服务")
+	err := userService.Clint.Call(ctx, request, response)
+	if err != nil {
+		log.Infof("服务调用出错了 error is %s\n", err.Error())
+		return response, err
+	}
+	return response, nil
+}
+
 func GetToken(ctx context.Context, user *entity.User) (string, error) {
 	service := micro.NewService()
 	service.Init()
