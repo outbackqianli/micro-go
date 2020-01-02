@@ -5,6 +5,8 @@ import (
 	"outback/micro-go/api/entity"
 	"outback/micro-go/api/service"
 
+	"github.com/opentracing/opentracing-go"
+
 	"github.com/micro/go-micro/util/log"
 
 	hystrix_go "github.com/afex/hystrix-go/hystrix"
@@ -13,7 +15,9 @@ import (
 )
 
 var (
-	userClient client.Client
+	userClient  client.Client
+	span        opentracing.Span
+	callWrapper client.CallWrapper
 )
 
 func Init() {
@@ -23,7 +27,23 @@ func Init() {
 	//userconfig := hystrix_go.CommandConfig{Timeout: hystrix_go.DefaultTimeout / 2}
 	//hystrix_go.ConfigureCommand("GET-/user/login", userconfig)
 	//userClient = breaker.NewUserClientWrapper()(client.DefaultClient)
-	userClient = client.DefaultClient
+	//userClient = client.DefaultClient
+	//t, io, err := tracer.NewTracer("user-web", "")
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//defer io.Close()
+	//userClient = microTraceing.NewClientWrapper(t)(client.DefaultClient)
+	//span = t.StartSpan("say-hello")
+	//span.SetTag("hello-to", "UserClient")
+	//callWrapper = microTraceing.NewCallWrapper(t)
+	//defer span.Finish()
+
+	//userClient = client.NewClient(
+	//	// set the selector
+	//	// add the trace wrapper
+	//	client.Wrap(microTraceing.NewClientWrapper(t)),
+	//)
 
 	//userClient.Init(
 	//	client.Retries(3),
@@ -38,6 +58,7 @@ func Init() {
 func QueryUserByName(ctx context.Context, name string) (*entity.User, error) {
 	userService := service.NewUserService(userClient)
 	request := userService.Clint.NewRequest(userService.Name, "UserHandler.QueryUserByName", name, client.WithContentType("application/json"))
+	//request := userClient.NewRequest(userService.Name, "UserHandler.QueryUserByName", name, client.WithContentType("application/json"))
 	response := new(entity.User)
 	log.Info("client 开始调用服务")
 	err := userService.Clint.Call(ctx, request, response)

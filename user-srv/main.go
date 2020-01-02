@@ -4,9 +4,13 @@ import (
 	"outback/micro-go/api/constent"
 	"outback/micro-go/basic"
 	"outback/micro-go/basic/db"
+	tracer "outback/micro-go/plugins/tracer/jaeger"
 	"outback/micro-go/user-srv/handler"
 
+	"github.com/opentracing/opentracing-go"
+
 	"github.com/micro/go-micro/util/log"
+	traceWraper "github.com/micro/go-plugins/wrapper/trace/opentracing"
 
 	"github.com/micro/cli"
 	"github.com/micro/go-micro"
@@ -17,10 +21,17 @@ func main() {
 	basic.Init()
 
 	// 新建服务
+	t, io, err := tracer.NewTracer("user-srv", "")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer io.Close()
+	opentracing.SetGlobalTracer(t)
+
 	service := micro.NewService(
 		micro.Name(constent.ServiceName),
 		micro.Version("latest"),
-		//micro.WrapHandler(openTrace.NewHandlerWrapper(opentracing.GlobalTracer())),
+		micro.WrapHandler(traceWraper.NewHandlerWrapper(t)),
 	)
 
 	// 服务初始化

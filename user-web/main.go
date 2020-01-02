@@ -26,7 +26,7 @@ func main() {
 	//micReg := etcd.NewRegistry(registryOptions)
 	//reg := memory.NewRegistry()
 
-	t, io, err := tracer.NewTracer("my-new-trace", "")
+	t, io, err := tracer.NewTracer("user-web-url", "")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -61,11 +61,8 @@ func main() {
 	r := mux.NewRouter()
 	// queries 表示必传参数，且只能成对出现
 	r.Path("/user/login").Methods("GET").HandlerFunc(handler.Login)
-	//hand := breaker.BreakerWrapper(handler.Login)
-
-	//service.HandleFunc("/user/login", handler.Login)
-
 	//service.Handle("/", breaker.BreakerWrapper(r))
+	// 增加链路追踪
 	service.Handle("/", std2micro.TracerWrapper(r))
 	// 运行服务
 	if err := service.Run(); err != nil {

@@ -6,8 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	statusCode "outback/micro-go/plugins/breaker/http"
-
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
 )
@@ -39,16 +37,17 @@ func TracerWrapper(h http.Handler) http.Handler {
 			log.Println(err)
 		}
 
-		sct := &statusCode.StatusCodeTracker{ResponseWriter: w, Status: http.StatusOK}
-		h.ServeHTTP(sct.WrappedResponseWriter(), r)
+		//sct := &statusCode.StatusCodeTracker{ResponseWriter: w, Status: http.StatusOK}
+		//h.ServeHTTP(sct.WrappedResponseWriter(), r)
+		h.ServeHTTP(w, r)
 
 		ext.HTTPMethod.Set(sp, r.Method)
 		ext.HTTPUrl.Set(sp, r.URL.EscapedPath())
-		ext.HTTPStatusCode.Set(sp, uint16(sct.Status))
-		if sct.Status >= http.StatusInternalServerError {
-			ext.Error.Set(sp, true)
-		} else if rand.Intn(100) > sf {
-			ext.SamplingPriority.Set(sp, 0)
-		}
+		//ext.HTTPStatusCode.Set(sp, uint16(sct.Status))
+		//if sct.Status >= http.StatusInternalServerError {
+		//	ext.Error.Set(sp, true)
+		//} else if rand.Intn(100) > sf {
+		//	ext.SamplingPriority.Set(sp, 0)
+		//}
 	})
 }
