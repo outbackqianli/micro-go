@@ -16,19 +16,28 @@ import (
 )
 
 var (
-	userClient  client.Client
+	//userClient  client.Client
 	span        opentracing.Span
 	callWrapper client.CallWrapper
 )
 
 func Init() {
-	hystrix_go.DefaultVolumeThreshold = 2
+	hystrix_go.DefaultVolumeThreshold = 3
 	hystrix_go.DefaultErrorPercentThreshold = 50
-	hystrix_go.DefaultTimeout = 1000 * 4
-	userClient = breaker.NewUserClientWrapper()(client.DefaultClient)
+	hystrix_go.DefaultTimeout = 1000 * 1
+	//userClient = breaker.NewUserClientWrapper()(client.DefaultClient)
 }
 
 func QueryUserByName(ctx context.Context, name string) (*entity.User, error) {
+	userClient := breaker.NewUserClientWrapper()(client.DefaultClient)
+	//userClient.Init(
+	//	client.Retries(3),
+	//	//为了调试看log方便，始终返回true, nil，即会一直重试直至重试次数用尽
+	//	client.Retry(func(ctx context.Context, req client.Request, retryCount int, err error) (bool, error) {
+	//		log.Log(req.Method(), retryCount, " client retry")
+	//		return true, nil
+	//	}),
+	//)
 	userService := service.NewUserService(userClient)
 	request := userService.Clint.NewRequest(userService.Name, "UserHandler.QueryUserByName", name, client.WithContentType("application/json"))
 	response := new(entity.User)
@@ -42,7 +51,9 @@ func QueryUserByName(ctx context.Context, name string) (*entity.User, error) {
 }
 
 func QueryUserByName2(ctx context.Context, name string) (*entity.User, error) {
+	userClient := client.DefaultClient
 	userService := service.NewUserService(userClient)
+
 	request := userService.Clint.NewRequest(userService.Name, "UserHandler.QueryUserByName2", name, client.WithContentType("application/json"))
 	response := new(entity.User)
 	log.Info("client 开始调用服务")

@@ -65,7 +65,7 @@ func TracerWrapper(h http.Handler) http.Handler {
 		md := make(map[string]string)
 		spanCtx, err := opentracing.GlobalTracer().Extract(opentracing.HTTPHeaders, opentracing.HTTPHeadersCarrier(r.Header))
 		if err != nil {
-			log.Info("new spanCtx error")
+			log.Info("new spanCtx error is ", err.Error())
 		}
 		sp := opentracing.GlobalTracer().StartSpan(r.URL.Path, opentracing.ChildOf(spanCtx))
 		defer sp.Finish()

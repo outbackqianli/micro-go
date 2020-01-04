@@ -7,7 +7,9 @@ import (
 	tracer "outback/micro-go/plugins/tracer/jaeger"
 	"outback/micro-go/plugins/tracer/opentracing/std2micro"
 	userClient "outback/micro-go/user-web/client"
+	"outback/micro-go/user-web/client/breaker"
 	"outback/micro-go/user-web/handler"
+	"time"
 
 	"github.com/afex/hystrix-go/hystrix"
 
@@ -45,6 +47,8 @@ func main() {
 		web.Version("latest"),
 		web.Registry(reg),
 		web.Address(":8088"),
+		web.RegisterTTL(time.Second*15),
+		web.RegisterInterval(time.Second*10),
 	)
 	hystrixStreamHandler := hystrix.NewStreamHandler()
 	hystrixStreamHandler.Start()
@@ -68,10 +72,10 @@ func main() {
 	r := mux.NewRouter()
 	// queries 表示必传参数，且只能成对出现
 	r.Path("/user/login").Methods("GET").HandlerFunc(handler.Login)
-	r.Path("/user/logintwo").Methods("GET").HandlerFunc(handler.Login2)
+	//r.Path("/user/logintwo").Methods("GET").HandlerFunc(handler.Login2)
 	//service.Handle("/", breaker.BreakerWrapper(r))
 	//增加链路追踪
-	service.Handle("/", std2micro.TracerWrapper(r))
+	service.Handle("/", std2micro.TracerWrapper(breaker.BreakerWrapper(r)))
 	// 运行服务
 	if err := service.Run(); err != nil {
 		log.Fatal(err)

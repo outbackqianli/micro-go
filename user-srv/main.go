@@ -6,6 +6,7 @@ import (
 	"outback/micro-go/basic/db"
 	tracer "outback/micro-go/plugins/tracer/jaeger"
 	"outback/micro-go/user-srv/handler"
+	"time"
 
 	"github.com/opentracing/opentracing-go"
 
@@ -32,6 +33,8 @@ func main() {
 		micro.Name(constent.ServiceName),
 		micro.Version("latest"),
 		micro.WrapHandler(traceWraper.NewHandlerWrapper(t)),
+		micro.RegisterTTL(time.Second*15),
+		micro.RegisterInterval(time.Second*10),
 	)
 
 	// 服务初始化
