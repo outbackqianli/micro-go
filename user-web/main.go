@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"net"
 	"net/http"
 	"outback/micro-go/basic"
+	"outback/micro-go/basic/config"
 	tracer "outback/micro-go/plugins/tracer/jaeger"
 	"outback/micro-go/plugins/tracer/opentracing/std2micro"
 	userClient "outback/micro-go/user-web/client"
@@ -11,23 +13,24 @@ import (
 	"outback/micro-go/user-web/handler"
 	"time"
 
+	"github.com/micro/go-plugins/registry/kubernetes"
+
 	"github.com/afex/hystrix-go/hystrix"
 
 	"github.com/opentracing/opentracing-go"
 
+	"github.com/micro/go-micro/registry"
 	"github.com/micro/go-micro/util/log"
 
 	"github.com/gorilla/mux"
 
 	"github.com/micro/cli"
-	"github.com/micro/go-micro/registry"
 	"github.com/micro/go-micro/web"
 )
 
 func main() {
 	// 初始化配置
 	basic.Init()
-
 	// 使用etcd注册
 	//micReg := etcd.NewRegistry(registryOptions)
 	//reg := memory.NewRegistry()
@@ -39,7 +42,7 @@ func main() {
 	defer io.Close()
 	opentracing.SetGlobalTracer(t)
 
-	reg := registry.DefaultRegistry
+	reg := kubernetes.NewRegistry(registryOptions)
 	// 创建新服务
 	service := web.NewService(
 		// 后面两个web，第一个是指是web类型的服务，第二个是服务自身的名字
@@ -80,4 +83,9 @@ func main() {
 	if err := service.Run(); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func registryOptions(ops *registry.Options) {
+	etcdCfg := config.GetEtcdConfig()
+	ops.Addrs = []string{fmt.Sprintf("%s:%d", etcdCfg.GetHost(), etcdCfg.GetPort())}
 }

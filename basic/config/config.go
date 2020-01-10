@@ -20,6 +20,7 @@ var (
 	defaultRootPath         = "app"
 	defaultConfigFilePrefix = "application-"
 	etcdConfig              defaultEtcdConfig
+	k8sConfig               defaultK8sConfig
 	mysqlConfig             defaultMysqlConfig
 	jwtConfig               defaultJwtConfig
 	redisConfig             defaultRedisConfig
@@ -94,6 +95,10 @@ func GetMysqlConfig() (ret MysqlConfig) {
 
 // GetEtcdConfig 获取etcd配置
 func GetEtcdConfig() (ret EtcdConfig) {
+	return etcdConfig
+}
+
+func GetK8sConfig() (ret EtcdConfig) {
 	return etcdConfig
 }
 

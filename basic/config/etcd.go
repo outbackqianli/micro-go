@@ -14,6 +14,13 @@ type defaultEtcdConfig struct {
 	Port    int    `json:"port"`
 }
 
+// defaultK8sConfig认 etcd 配置
+type defaultK8sConfig struct {
+	Enabled bool   `json:"enabled"`
+	Host    string `json:"host"`
+	Port    int    `json:"port"`
+}
+
 // GetPort consul 端口
 func (c defaultEtcdConfig) GetPort() int {
 	return c.Port
