@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"outback/micro-go/api/constent"
 	"outback/micro-go/basic"
 	"outback/micro-go/basic/db"
@@ -36,7 +37,8 @@ func main() {
 		micro.RegisterTTL(time.Second*15),
 		micro.RegisterInterval(time.Second*10),
 	)
-
+	var HeLLo string
+	fmt.Println(HeLLo)
 	// 服务初始化
 	service.Init(micro.Action(func(c *cli.Context) {
 		db.Init()
